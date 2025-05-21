@@ -53,7 +53,11 @@ If we need a function that accepts `int32`, `int64`, and `float32`, then we will
 
 * Example with generic code
 .code generics.go /START OMIT/,/END OMIT/
-We now have a single generic function which accepts multiple types that is constrainted by `Integer` interface.
+Here, we declare the `Integer` interface which is a *union* *of* *types* that contains all standard integer types in Go.
+
+Then, we create a generic function which accepts `Integer` interface in the type parameter.
+
+This way, we only have one single function that can sum numbers within all standard integer types in Go.
 
 * The type constraints are basically interfaces
 .code generic_sugar.go /START OMIT/,/END OMIT/
