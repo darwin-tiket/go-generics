@@ -41,11 +41,12 @@ Instantiation
 * When don't we use generics?
 - When just use for calling a method in a type constraint.
 .code generic_not_useful.go /START OMIT/,/END OMIT/
-- When the implementation of a function is different for each type.
+- When the implementation of a common function/method is different for each type.
+- When the operation is different for each type, even without a function/method.
 
 * Example with non-generic code
 .code non-generics.go /START OMIT/,/END OMIT/
-If we need a function that accepts `int32`, `int64`, and `float32`, then we will need to implement 3 functions with same logic again.
+If we need a function that accepts `int32`, `int64`, and `float32`, then we will need to implement 3 functions with similar logic again.
 
 * Or with interface{}
 .code interface.go /START OMIT/,/END OMIT/
@@ -59,7 +60,7 @@ We now have a single generic function which accepts multiple types that is const
 Equals to
 .code generic_sugar1.go /START OMIT/,/END OMIT/
 
-So you can write
+So we can write
 .code generic_sugar2.go /START OMIT/,/END OMIT/
 Or
 .code generic_sugar3.go /START OMIT/,/END OMIT/
@@ -71,7 +72,7 @@ For example, we want to create a function to get order ids from orders list.
 
 We can see there are identical logic patterns as we need to implement this logic for different type. So, how to generalize it?
 
-* Solutions No. 1
+* Solutions No. 1 (Generic Map Functions)
 .code generic_real_world.go /START OMIT/,/END OMIT/
 Generalize the type to accept a type parameter. And we can use it simply
 .code generic_map.go /START OMIT/,/END OMIT/
@@ -89,7 +90,7 @@ Suppose we have a function to check the existence order type of list of order ty
 
 As we see here these two functions are identical. How can we combine this into a single generic function that can serve multiple use cases?
 
-* Solutions No. 2
+* Solutions No. 2 (Generic Find Functions)
 We implement the generic function named `SliceAny` which checks whether the expected item exists in the list of items regardless of the data type.
 .code generic_find.go /START OMIT/,/END OMIT/
 We use `comparable` type constraint which provided default by Go when we want to perform equality check (e.g. ==, !=) between generic types.
@@ -99,7 +100,7 @@ Suppose we want to return a HTTP API response in our service. And we have
 .code nongeneric_response.go /START OMIT/,/END OMIT/
 If we want to return a pay order HTTP API response, then we have to create another separate object.
 
-* Solutions No. 3
+* Solutions No. 3 (Generic Structs or Objects)
 .code generic_response.go /START OMIT/,/END OMIT/
 Now we have a single generic HTTP API response that can serve multiple object types.
 
@@ -111,7 +112,7 @@ Suppose we have a function to get orders data asynchronously.
 .code nongeneric_channel.go /START OMIT/,/END OMIT/
 What if we just want a single function that can process arbitrary tasks asynchronously regardless only find orders?
 
-* Solutions No. 4
+* Solutions No. 4 (Generic Async Functions)
 .code generic_channel.go /START OMIT/,/END OMIT/
 Now we can use this function for every tasks that process asynchronously.
 
@@ -138,14 +139,12 @@ With Go 1.24, there are several new official packages that make use of generics
 - If using correctly, generics provide better runtime performance than using empty `interface{}` due to (partial) _monomorphization_.
 
 * Disadvantages of Generics
-- As of now, generics are not supported for struct methods. 
+- As of now, generics are still not supported for struct methods. 
 .link https://github.com/golang/go/issues/49085
-- If using incorrectly, generics 
+- If passing with pointer type of method or non-empty interface types to generic, then it will add runtime overhead as it will not _monomorphize_ the implementation and behave similarly like passing interface to function parameter.
 - With some _monomorphization_ implemented in Go generics, it will affect compilation time and binary size produced.
 - Type constraint in Go is not that expressive and powerful compare to other languages.
 - The standard library that implements generics is still limited and not perfect.
-- Generics can actually make your code slower if wrongly use.
-.link https://planetscale.com/blog/generics-can-make-your-go-code-slower
 
 * References
 
